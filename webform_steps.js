@@ -7,7 +7,7 @@ Drupal.behaviors.webform_steps.attach = function(context, settings) {
     if ($target.is('span')) {
       $target.find('input').click();
     }
-  });
+  }).addClass('webform-steps-clickable').addClass('clickable');
 }
 
 })(jQuery);

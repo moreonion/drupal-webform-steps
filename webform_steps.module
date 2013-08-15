@@ -137,7 +137,7 @@ class WebformStepsButtonBuilder {
       $button['#id'] = drupal_html_id('edit-webform-ajax-btn-' . $i);
     }
     $button += array(
-      '#prefix' => '<span class="webform-step ' . implode(' ', $wrapper_classes) . '"><span>',
+      '#prefix' => '<span class="webform-step ' . implode(' ', $wrapper_classes) . '"><span>' . $title,
       '#suffix' => '</span></span>',
       '#value' => $title,
       '#page' => $i,
