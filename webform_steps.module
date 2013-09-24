@@ -10,7 +10,6 @@ function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $for
   $page_count = $form['details']['page_count']['#value'];
   if($page_count > 1) {
     array_unshift($form['#submit'], '_webform_steps_mark_step_done');
-    array_unshift($form['#validate'], '_webform_steps_clear');
 
     $form['webform_steps'] = array(
       '#type' => 'container',
@@ -18,13 +17,6 @@ function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $for
       '#attributes' => array('id' => array('webform-steps-wrapper'), 'class' => array('webform-steps-wrapper')),
     ) + _webform_steps_generate($form, $form_state);
   }
-}
-
-/**
- * Validate callback: Don't save steps container.
- */
-function _webform_steps_clear($form, &$form_state) {
-  unset($form_state['values']['submitted']['steps']);
 }
 
 /**
