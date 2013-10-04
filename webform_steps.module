@@ -108,6 +108,11 @@ class WebformStepsButtonBuilder {
   public function buildButton($i, $title) {
     $button = $this->default;
     $wrapper_classes = array();
+    if($i < $this->current) {
+      $wrapper_classes[] = 'previous';
+      $button['#validate'] = array();
+      $button['#attributes']['formnovalidate'] = 'formnovalidate';
+    }
     if($i === $this->current) {
       $wrapper_classes[] = 'current';
     }
