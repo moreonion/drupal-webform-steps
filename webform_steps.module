@@ -171,7 +171,13 @@ function _webform_steps_mark_step_done(&$form, &$form_state) {
   $finished = isset($form_state['steps_finished']) ? $form_state['steps_finished'] : 0;
   $current_step = $form['details']['page_num']['#value'];
   if ($current_step > $finished) {
-    $form_state['steps_finished'] = $form['details']['page_num']['#value'];
+    $form_state['steps_finished'] = $current_step;
   }
+
+  // hacky but functional, better solutions welcome.
+  if ($form_state['clicked_button']['#id'] === 'edit-previous') {
+    $form_state['steps_finished'] = $current_step - 1;
+  }
+
   return $form;
 }
