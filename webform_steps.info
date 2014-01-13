@@ -6,4 +6,5 @@ package = "Webform"
 dependencies[] = webform
 ; dependencies[] = webform_ajax
 
+stylesheets[screen][] = webform_steps.css
 scripts[] = webform_steps.js

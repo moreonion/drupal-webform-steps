@@ -7,10 +7,10 @@ Drupal.behaviors.webform_steps.attach = function(context, settings) {
     if ($target.is('span')) {
       var $input = $target.find('input');
       if ($input.is(':enabled')) {
-        $input.mousedown();
+        $input.click();
       };
     }
-  }).addClass('webform-steps-clickable').addClass('clickable');
+  });
 }
 
 })(jQuery);

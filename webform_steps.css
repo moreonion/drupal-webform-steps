@@ -1,0 +1,38 @@
+.webform-steps-wrapper {
+  background: #f0f0f0;
+  border-top: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.webform-steps-wrapper .webform-step {
+  color: #555555;
+  display: inline-block;
+}
+
+.webform-steps-wrapper .webform-step span:before {
+  content: "»";
+}
+
+.webform-steps-wrapper .webform-step span {
+  display: block;
+  padding: .3em .6em .3em .6em;
+}
+
+.webform-steps-wrapper .webform-step input {
+  position: absolute !important;
+  clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+  clip: rect(1px, 1px, 1px, 1px);
+}
+
+.webform-steps-wrapper .webform-step {
+  cursor: pointer;
+}
+
+.webform-steps-wrapper .disabled {
+  color: #999999;
+  cursor: default;
+}
+.webform-steps-wrapper .current {
+  color: #000000;
+  cursor: default;
+}

@@ -11,10 +11,12 @@ function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $for
   if($page_count > 1) {
     array_unshift($form['#submit'], '_webform_steps_mark_step_done');
 
+    // Sadly there is nothing we can do about webform-form.tpl.php rendering
+    // $form['submitted'] above all other form elements.
     $form['webform_steps'] = array(
       '#type' => 'container',
       '#weight' => -1000,
-      '#attributes' => array('id' => array('webform-steps-wrapper'), 'class' => array('webform-steps-wrapper')),
+      '#attributes' => array('class' => array('webform-steps-wrapper')),
     ) + _webform_steps_generate($form, $form_state);
   }
 }
@@ -178,6 +180,4 @@ function _webform_steps_mark_step_done(&$form, &$form_state) {
   if ($form_state['clicked_button']['#id'] === 'edit-previous') {
     $form_state['steps_finished'] = $current_step - 1;
   }
-
-  return $form;
 }
