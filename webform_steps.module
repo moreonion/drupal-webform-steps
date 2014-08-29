@@ -4,7 +4,7 @@
  * Implements hook_theme().
  */
 function webform_steps_theme() {
-  $theme['webform_step'] = array(
+  $theme['webform_steps'] = array(
     'render element' => 'element',
   );
   return $theme;
@@ -25,6 +25,7 @@ function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $for
     // $form['submitted'] above all other form elements.
     $form['webform_steps'] = array(
       '#type' => 'container',
+      '#theme' => 'webform_steps',
       '#weight' => -1000,
       '#attributes' => array('class' => array('webform-steps-wrapper')),
     ) + _webform_steps_generate($form, $form_state);
@@ -146,7 +147,6 @@ class WebformStepsButtonBuilder {
       '#value' => $title,
       '#page' => $i,
       '#wrapper_classes' => $wrapper_classes,
-      '#theme_wrappers' => array('button', 'webform_step'),
     );
     return $button;
   }
@@ -192,8 +192,15 @@ function _webform_steps_mark_step_done(&$form, &$form_state) {
   }
 }
 
-function theme_webform_step($variables) {
+function theme_webform_steps($variables) {
   $element = &$variables['element'];
-  $classes = 'webform-step ' . implode(' ', $element['#wrapper_classes']);
-  return "<span class=\"$classes\"><span>{$element['#value']}{$element['#children']}</span></span>";
+  $buttons = element_children($element, FALSE);
+  $output = array();
+  foreach ($buttons as $key) {
+    $button = &$element[$key];
+    $classes = 'webform-step ' . implode(' ', $button['#wrapper_classes']);
+    $rendered = render($button);
+    $output[] = "<span class=\"$classes\"><span>{$button['#value']}{$rendered}</span></span>";
+  }
+  return implode('', $output);
 }
