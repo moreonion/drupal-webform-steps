@@ -7,6 +7,10 @@
  * Add submit and validate handlers to handle the step-switching.
  */
 function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $form_id) {
+  // Let the webform3-shim add the progressbar.
+  if (function_exists('webform_steps_w3_progressbar')) {
+    webform_steps_w3_progressbar($form, $form_state);
+  }
   if (empty($form['progressbar'])) {
     return;
   }
