@@ -28,7 +28,17 @@ function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $for
       '#theme' => 'webform_steps',
       '#weight' => -1000,
       '#attributes' => array('class' => array('webform-steps-wrapper')),
-    ) + _webform_steps_generate($form, $form_state);
+    );
+    // Hitting enter to submit always submits via the first button in the markup.
+    // We want this to always be the next button.
+    $button = isset($form['actions']['submit']) ? $form['actions']['submit'] : $form['actions']['next'];
+    $form['webform_steps']['next'] = array(
+      '#type' => 'submit',
+      '#value' => $button['#value'],
+      '#attributes' => array('class' => array('element-invisible')),
+      '#weight' => -100,
+    );
+    $form['webform_steps'] += _webform_steps_generate($form, $form_state);
   }
 }
 
@@ -198,9 +208,15 @@ function theme_webform_steps($variables) {
   $output = array();
   foreach ($buttons as $key) {
     $button = &$element[$key];
-    $classes = 'webform-step ' . implode(' ', $button['#wrapper_classes']);
-    $rendered = render($button);
-    $output[] = "<span class=\"$classes\"><span>{$button['#value']}{$rendered}</span></span>";
+    if ($key == 'next') {
+      $output[] = render($button);
+    }
+    else {
+      $button = &$element[$key];
+      $classes = 'webform-step ' . implode(' ', $button['#wrapper_classes']);
+      $rendered = render($button);
+      $output[] = "<span class=\"$classes\"><span>{$button['#value']}{$rendered}</span></span>";
+    }
   }
   return implode('', $output);
 }
