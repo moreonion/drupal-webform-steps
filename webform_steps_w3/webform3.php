@@ -23,7 +23,10 @@ function webform_steps_w3_theme() {
  * Implements hook_theme_registry_alter().
  */
 function webform_steps_w3_theme_registry_alter(&$theme) {
-  $theme['webform_form']['template'] = drupal_get_path('module', 'webform_steps_w3') . '/templates/webform-form';
+  $webform_path = '/webform/templates';
+  if (substr($theme['webform_form']['path'], -strlen($webform_path)) == $webform_path) {
+    $theme['webform_form']['path'] = drupal_get_path('module', 'webform_steps_w3') . '/templates';
+  }
 }
 
 /**
