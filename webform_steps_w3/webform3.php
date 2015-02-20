@@ -99,12 +99,12 @@ function webform_steps_w3_form_webform_configure_form_alter(&$form, &$form_state
     '#collapsed' => TRUE,
     '#weight' => 15,
   );
-  $progress_bar_style = array_filter(array(
-    $node->webform['progressbar_page_number'] ? 'progressbar_page_number' : NULL,
-    $node->webform['progressbar_percent'] ? 'progressbar_percent' : NULL,
-    $node->webform['progressbar_bar'] ? 'progressbar_bar' : NULL,
-    $node->webform['progressbar_pagebreak_labels'] ? 'progressbar_pagebreak_labels' : NULL,
-  ));
+  $progress_bar_style = array();
+  foreach (array('page_number', 'percent', 'bar', 'pagebreak_labels') as $name) {
+    if (!empty($node->webform['progressbar_' . $name])) {
+      $progress_bar_style[] = 'prgoressbar_' . $name;
+    }
+  }
   $form['progressbar']['webform_progressbar_style']  = array(
     '#type' => 'checkboxes',
     '#title' => t('Progress bar style'),
@@ -187,17 +187,27 @@ function webform_steps_w3_node_load($nodes, $types) {
   if (count(array_intersect($types, $webform_types)) == 0) {
     return;
   }
+  $defaults = webform_steps_w3_node_defaults();
 
   // Select all webforms that match these node IDs.
-  $result = db_select('webform_steps_w3_progressbar', 'settings')
-    ->fields('settings')
-    ->condition('nid', array_keys($nodes), 'IN')
+  $q = db_select('webform', 'w');
+  $q->leftJoin('webform_steps_w3_progressbar', 'settings', 'w.nid=settings.nid');
+  $q->addfield('settings', 'nid', 'has_settings');
+  $result = $q->fields('w', array('nid'))
+    ->fields('settings', array_keys($defaults))
+    ->condition('w.nid', array_keys($nodes), 'IN')
     ->execute()
     ->fetchAllAssoc('nid', PDO::FETCH_ASSOC);
 
   foreach ($result as $nid => $settings) {
     // Add progressbar settings to each node.
-    $nodes[$nid]->webform += $settings;
+    if ($settings['has_settings']) {
+      unset($settings['has_settings']);
+      $nodes[$nid]->webform += $settings;
+    }
+    else {
+      $nodes[$nid]->webform += $defaults;
+    }
   }
 }
 
