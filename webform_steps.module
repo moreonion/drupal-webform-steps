@@ -37,13 +37,14 @@ function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $for
     '#weight' => -100,
   ) + $button;
 
+  array_unshift($form['#submit'], 'webform_steps_navigation_callback');
+
   $ajax = module_exists('webform_ajax') && $form['#node']->webform['webform_ajax'];
   $current_page = $form_state['webform']['page_num'];
   foreach ($form['progressbar']['#page_labels'] as $n => $label) {
     $page = $n+1;
     $button = array(
       '#type' => 'submit',
-      '#submit' => array('webform_steps_navigation_callback', 'webform_client_form_pages', 'webform_client_form_submit'),
       '#attributes' => array('class' => array('step-button')),
       '#name' => 'step-btn',
       '#value' => $label,
@@ -82,20 +83,23 @@ function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $for
  * @see webform_client_form_pages().
  */
 function webform_steps_navigation_callback(&$form, &$form_state) {
-  $new_page = (int) $form_state['clicked_button']['#page'];
+  $button = &$form_state['clicked_button'];
+  if (!isset($button['#page'])) {
+    return;
+  }
+  $new_page = (int) $button['#page'];
   $old_page = &$form_state['webform']['page_num'];
   // prohibit jumps of more than one step forward at once, after the user
   // jumped back, otherwise one could skip the validations of a step.
   $new_page = min($new_page, $old_page + 1);
-  $forward = $new_page > $old_page;
-  if ($forward) {
+  if ($new_page > $old_page) {
     // simulate click on next.
-    $form_state['clicked_button']['#parents'][] =  'next';
+    $button['#parents'][] =  'next';
     $old_page = $new_page - 1;
   } else {
     // simulate click on previous.
     $old_page = $new_page + 1;
-    $form_state['clicked_button']['#parents'][] =  'previous';
+    $button['#parents'][] =  'previous';
   }
   $form_state['values']['op'] = 'next';
   return $form;
