@@ -24,8 +24,9 @@ function webform_steps_w3_theme() {
  */
 function webform_steps_w3_theme_registry_alter(&$theme) {
   $webform_path = '/webform/templates';
-  if (substr($theme['webform_form']['path'], -strlen($webform_path)) == $webform_path) {
-    $theme['webform_form']['path'] = drupal_get_path('module', 'webform_steps_w3') . '/templates';
+  $theme_path = &$theme['webform_form']['path'];
+  if (!isset($theme_path) || substr($theme_path, -strlen($webform_path)) == $webform_path) {
+    $theme_path = drupal_get_path('module', 'webform_steps_w3') . '/templates';
   }
 }
 
