@@ -184,6 +184,7 @@ function webform_steps_navigation_callback(&$form, &$form_state) {
     // jumped back, otherwise one could skip the validations of a step.
     $form_state['steps_finished'] = $old_page - 2;
     // simulate click on previous.
+    $button['#parents'][] =  'previous';
     $old_page = $new_page + 1;
   }
   $form_state['values']['op'] = 'next';
