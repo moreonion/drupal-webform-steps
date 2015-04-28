@@ -19,7 +19,6 @@ function webform_steps_theme() {
 function webform_steps_form_webform_client_form_alter(&$form, &$form_state, $form_id) {
   $page_count = $form['details']['page_count']['#value'];
   if($page_count > 1) {
-    array_unshift($form['#submit'], '_webform_steps_mark_step_done');
     array_unshift($form['#submit'], 'webform_steps_navigation_callback');
 
     // Sadly there is nothing we can do about webform-form.tpl.php rendering
@@ -169,42 +168,35 @@ class WebformStepsButtonBuilder {
  * @see webform_client_form_pages().
  */
 function webform_steps_navigation_callback(&$form, &$form_state) {
+  $submitted_page = $form['details']['page_num']['#value'];
   $button = &$form_state['clicked_button'];
-  if (!isset($button['#page'])) {
-    return;
+
+  if (isset($button['#page'])) {
+    $new_page = (int) $button['#page'];
+    if ($submitted_page <= $new_page && $new_page > 1) {
+      // simulate click on next.
+      $button['#parents'][] =  'next';
+      // Failsafe to avoid jumping over steps.
+      $form_state['webform']['page_num'] = min($new_page - 1, $submitted_page);
+      $form_state['steps_finished'] = $submitted_page;
+    } else {
+      // simulate click on previous.
+      $button['#parents'][] =  'previous';
+      $form_state['webform']['page_num'] = $new_page + 1;
+      // prohibit jumps of more than one step forward at once, after the user
+      // jumped back, otherwise one could skip the validations of a step.
+      $form_state['steps_finished'] = $new_page;
+    }
+    $form_state['values']['op'] = 'next';
   }
-  $new_page = (int) $button['#page'];
-  $old_page = &$form_state['webform']['page_num'];
-  if ($old_page <= $new_page && $new_page > 1) {
-    // simulate click on next.
-    $button['#parents'][] =  'next';
-    $old_page = $new_page - 1;
-  } else {
-    // prohibit jumps of more than one step forward at once, after the user
-    // jumped back, otherwise one could skip the validations of a step.
-    $form_state['steps_finished'] = $old_page - 2;
-    // simulate click on previous.
-    $button['#parents'][] =  'previous';
-    $old_page = $new_page + 1;
+  elseif (end($button['#parents']) == 'next') {
+    $form_state['steps_finished'] = $submitted_page;
   }
-  $form_state['values']['op'] = 'next';
+  else {
+    $form_state['steps_finished'] = $submitted_page - 1;
+  }
+
   return $form;
-}
-
-/**
- * Keep the last finished page number in the $form_state.
- */
-function _webform_steps_mark_step_done(&$form, &$form_state) {
-  $finished = isset($form_state['steps_finished']) ? $form_state['steps_finished'] : 0;
-  $current_step = $form['details']['page_num']['#value'];
-  if ($current_step > $finished) {
-    $form_state['steps_finished'] = $current_step;
-  }
-
-  // hacky but functional, better solutions welcome.
-  if ($form_state['clicked_button']['#id'] === 'edit-previous') {
-    $form_state['steps_finished'] = $current_step - 1;
-  }
 }
 
 function theme_webform_steps($variables) {
