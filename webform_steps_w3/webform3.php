@@ -106,7 +106,7 @@ function webform_steps_w3_form_webform_configure_form_alter(&$form, &$form_state
   $progress_bar_style = array();
   foreach (array('page_number', 'percent', 'bar', 'pagebreak_labels') as $name) {
     if (!empty($node->webform['progressbar_' . $name])) {
-      $progress_bar_style[] = 'prgoressbar_' . $name;
+      $progress_bar_style[] = 'progressbar_' . $name;
     }
   }
   $form['progressbar']['webform_progressbar_style']  = array(
