@@ -100,7 +100,6 @@ function webform_steps_navigation_callback(&$form, &$form_state) {
     // simulate click on previous.
     $button['#parents'][] =  'previous';
     $old_page = $new_page + 1;
-    $button['#parents'][] =  'previous';
   }
   $form_state['values']['op'] = 'next';
   return $form;
