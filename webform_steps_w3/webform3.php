@@ -223,10 +223,12 @@ function webform_steps_w3_node_insert($node) {
     return;
   }
   $record = array_intersect_key($node->webform, webform_steps_w3_node_defaults() + array('nid' => TRUE));
-  db_merge('webform_steps_w3_progressbar')
-    ->key(array('nid' => $node->nid))
-    ->fields($record)
-    ->execute();
+  if ($record) {
+    db_merge('webform_steps_w3_progressbar')
+      ->key(array('nid' => $node->nid))
+      ->fields($record)
+      ->execute();
+  }
 }
 
 /**
