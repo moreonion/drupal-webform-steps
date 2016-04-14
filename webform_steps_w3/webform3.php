@@ -80,7 +80,7 @@ function webform_steps_w3_progressbar(&$form, &$form_state) {
 function webform_steps_w3_page_labels($node, $form_state = array()) {
   $page_count = 1;
   $page_labels = array();
-  $page_labels[0] = t($node->webform['progressbar_label_first']);
+  $page_labels[0] = $node->webform['progressbar_label_first'];
   foreach ($node->webform['components'] as $component) {
     if ($component['type'] == 'pagebreak') {
       $page_labels[$page_count] = $component['name'];
