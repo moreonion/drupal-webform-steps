@@ -14,11 +14,14 @@ function webform_steps_install() {
  * Enable webform_steps_w3.
  */
 function webform_steps_update_7200() {
-  module_enable(array('webform_steps_w3'), FALSE);
-  variable_set('webform_progressbar_style', array(
-    'progressbar_bar',
-    'progressbar_pagebreak_labels',
-  ));
+  // Enable webform_steps_w3 if webform4 is not available.
+  if (!function_exists('template_preprocess_webform_progressbar')) {
+    module_enable(array('webform_steps_w3'), FALSE);
+    variable_set('webform_progressbar_style', array(
+      'progressbar_bar',
+      'progressbar_pagebreak_labels',
+    ));
+  }
 }
 
 /**
@@ -26,12 +29,21 @@ function webform_steps_update_7200() {
  */
 function webform_steps_update_7201() {
   // Enable the progressbar on all webforms.
-  $sql = <<<SQL
+  if (module_exists('webform_steps_w3')) {
+    $sql = <<<SQL
 INSERT INTO {webform_steps_w3_progressbar}
   (nid, progressbar_bar, progressbar_pagebreak_labels, progressbar_label_first)
 SELECT nid, 1, 1, 'Start' FROM {webform}
 SQL;
-  db_query($sql);
+    db_query($sql);
+  }
+  elseif (!function_exists('template_preprocess_webform_progressbar')) {
+    $sql = <<<SQL
+UPDATE {webform}
+SET progressbar_bar=1, progressbar_pagebreak_labels=1, progressbar_label_first='Start'
+SQL;
+    db_query($sql);
+  }
 
   // webform_steps-7.x-1.x uses the name of the first fieldset on the page as
   // label. If the page doesn't have a fieldset the name of it's preceding
@@ -41,6 +53,12 @@ SQL;
   $nids = db_query($sql)->fetchCol();
   foreach ($nids as $nid) {
     $node = node_load($nid);
+
+    // Set defaults.
+    $node->webform['progressbar_bar'] = 1;
+    $node->webform['progressbar_pagebreak_labels'] = 1;
+    $node->webform['progressbar_label_first'] = 'Start';
+
     $components = &$node->webform['components'];
     $breaks = array();
     $first_fieldset = array(1 => NULL);
