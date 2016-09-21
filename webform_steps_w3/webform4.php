@@ -20,7 +20,7 @@ function webform_steps_w3_form_webform_admin_settings_alter(&$form, &$form_state
 /**
  * Copy setting from webform_steps_w3_progressbar to webform.
  */
-function webform_steps_w3_migrate($form, &$form_state) {
+function webform_steps_w3_migrate() {
   $sql = <<<SQL
 UPDATE {webform} w INNER JOIN {webform_steps_w3_progressbar} w3 USING(nid)
 SET
@@ -32,4 +32,34 @@ SET
 SQL;
   db_query($sql);
   drupal_set_message(t('All configurations have now been migrated to webform4. You can now safely disable and uninstall webform_steps_w3.'));
+}
+
+/**
+ * Implements hook_node_load().
+ */
+function webform_steps_w3_node_load($nodes, $types) {
+  // Quick check to see if we need to do anything at all for these nodes.
+  $webform_types = webform_variable_get('webform_node_types');
+  if (count(array_intersect($types, $webform_types)) == 0) {
+    return;
+  }
+  $defaults = webform_steps_w3_node_defaults();
+
+  // Select all webforms that match these node IDs.
+  $q = db_select('webform', 'w');
+  $q->leftJoin('webform_steps_w3_progressbar', 'settings', 'w.nid=settings.nid');
+  $q->addfield('settings', 'nid', 'has_settings');
+  $result = $q->fields('w', array('nid'))
+    ->fields('settings', array_keys($defaults))
+    ->condition('w.nid', array_keys($nodes), 'IN')
+    ->execute()
+    ->fetchAllAssoc('nid', PDO::FETCH_ASSOC);
+
+  foreach ($result as $nid => $settings) {
+    // Add progressbar settings to each node.
+    if ($settings['has_settings']) {
+      unset($settings['has_settings']);
+      $nodes[$nid]->webform = $settings + $nodes[$nid]->webform;
+    }
+  }
 }

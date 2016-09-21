@@ -53,6 +53,16 @@ function webform_steps_w3_schema() {
 }
 
 /**
+ * Implements hook_disable().
+ */
+function webform_steps_w3_disable() {
+  // Migrate all data from this module to {webform} if webform-7.x-4.x is installed.
+  if (db_field_exists('webform', 'progressbar_bar')) {
+    webform_steps_w3_migrate();
+  }
+}
+
+/**
  * Implements hook_uninstall().
  */
 function webform_steps_w3_uninstall() {
