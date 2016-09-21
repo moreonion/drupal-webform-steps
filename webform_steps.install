@@ -37,7 +37,7 @@ SELECT nid, 1, 1, 'Start' FROM {webform}
 SQL;
     db_query($sql);
   }
-  elseif (!function_exists('template_preprocess_webform_progressbar')) {
+  elseif (function_exists('template_preprocess_webform_progressbar')) {
     $sql = <<<SQL
 UPDATE {webform}
 SET progressbar_bar=1, progressbar_pagebreak_labels=1, progressbar_label_first='Start'
