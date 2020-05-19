@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Implements hook_install().
+ * Remove webform_steps_w3.
  */
-function webform_steps_install() {
-  if (!function_exists('webform_page_labels')) {
-    // We are on webform3 - we must enable the shim.
-    module_enable(array('webform_steps_w3'), FALSE);
+function webform_steps_update_7300() {
+  if (module_exists('webform_steps_w3')) {
+    module_disable(['webform_steps_w3'], FALSE);
+    drupal_uninstall_modules(['webform_steps_w3'], FALSE);
   }
 }
 
